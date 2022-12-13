@@ -1,30 +1,36 @@
-fetch(genres_list_http + new URLSearchParams({
-    api_key: api_key
-}))
-.then(resp => resp.json())
-.then(data => {
-    data.genres.forEach(item => {
-        fetchMoviesListByGenres(item.id,item.name)
-    });
-})
-
-const fetchMoviesListByGenres = (id, genres)=>{
-    fetch(movies_genres_http + new URLSearchParams({
-        api_key:api_key,
-        with_genres: id,
-        page: Math.floor(Math.random() *3)+1
-    }))
-    .then(res => res.json())
-   /* .then(data => console.log(data))*/
-    .then(data =>{
-        makeCategoryElement(`${genres}_movies`,data.results)
+fetch(
+  genres_list_http +
+    new URLSearchParams({
+      api_key: api_key,
     })
-    .catch(err => console.log(err))
-}
+)
+  .then((resp) => resp.json())
+  .then((data) => {
+    data.genres.forEach((item) => {
+      fetchMoviesListByGenres(item.id, item.name);
+    });
+  });
 
-const main = document.querySelector(".main")
-const makeCategoryElement = (category,data)=>{
-    main.innerHTML += `
+const fetchMoviesListByGenres = (id, genres) => {
+  fetch(
+    movies_genres_http +
+      new URLSearchParams({
+        api_key: api_key,
+        with_genres: id,
+        page: Math.floor(Math.random() * 3) + 1,
+      })
+  )
+    .then((res) => res.json())
+    /* .then(data => console.log(data))*/
+    .then((data) => {
+      makeCategoryElement(`${genres}_movies`, data.results);
+    })
+    .catch((err) => console.log(err));
+};
+
+const main = document.querySelector(".main");
+const makeCategoryElement = (category, data) => {
+  main.innerHTML += `
     
   
     <div class="movie-list">
@@ -44,16 +50,33 @@ const makeCategoryElement = (category,data)=>{
         </button>
 
     </div>
-    `
-    makeCards(category, data)
-}
+    `;
+  makeCards(category, data);
+};
 
-const makeCards = (id, data )=>{
-    const movieContainer = document.querySelector(id)
+const makeCards = (id, data) => {
+  const movieContainer = document.getElementById(id);
 
-    data.forEach((item, i)=>{
-        if(item.backdrop_path == null){
-            item.backdrop_path = item.poster_path;
+  data.forEach((item, i) => {
+    if (item.backdrop_path == null) {
+      item.backdrop_path = item.poster_path;
+      if (item.backdrop_path == null) {
+        return;
+      }
+    }
+
+
+    movieContainer.innerHTML += `
+        <div class="movie">
+            <img src="${img_url}${item.backdrop_path}" alt="poster">
+            <p class="movie-title">${item.title}</p>
+        </div>
+        `;
+
+        if(i == data.length -1){
+            setTimeout(()=>{
+                setupScrooling()
+            },100)
         }
-    })
-}
+  });
+};
